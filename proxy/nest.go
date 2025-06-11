@@ -54,14 +54,12 @@ func modifyURL(url string, host string, cfg *config.Config) string {
 	// 去除url内的https://或http://
 	matched, err := EditorMatcher(url, cfg)
 	if err != nil {
-		logDump("Invalid URL: %s", url)
 		return url
 	}
 	if matched {
 		var u = url
 		u = strings.TrimPrefix(u, "https://")
 		u = strings.TrimPrefix(u, "http://")
-		logDump("Modified URL: %s", "https://"+host+"/"+u)
 		return "https://" + host + "/" + u
 	}
 	return url
@@ -158,7 +156,6 @@ func processLinks(input io.ReadCloser, compress string, host string, cfg *config
 
 			// 替换所有匹配的 URL
 			modifiedLine := urlPattern.ReplaceAllStringFunc(line, func(originalURL string) string {
-				logDump("originalURL: %s", originalURL)
 				return modifyURL(originalURL, host, cfg) // 假设 modifyURL 函数已定义
 			})
 

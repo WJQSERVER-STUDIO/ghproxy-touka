@@ -142,7 +142,7 @@ func GhcrRequest(ctx context.Context, c *touka.Context, u string, image *imageIn
 	if image != nil {
 		token, exist := cache.Get(image.Image)
 		if exist {
-			logDebug("Use Cache Token: %s", token)
+			c.Debugf("Use Cache Token: %s", token)
 			req.Header.Set("Authorization", "Bearer "+token)
 		}
 	}
@@ -166,7 +166,7 @@ func GhcrRequest(ctx context.Context, c *touka.Context, u string, image *imageIn
 
 			// 更新kv
 			if token != "" {
-				logDump("Update Cache Token: %s", token)
+				c.Debugf("Update Cache Token: %s", token)
 				cache.Put(image.Image, token)
 			}
 
@@ -218,17 +218,17 @@ func GhcrRequest(ctx context.Context, c *touka.Context, u string, image *imageIn
 		var err error
 		bodySize, err = strconv.Atoi(contentLength)
 		if err != nil {
-			logWarning("%s %s %s %s %s Content-Length header is not a valid integer: %v", c.ClientIP(), c.Request.Method, c.Request.URL.Path, c.UserAgent(), c.Request.Proto, err)
+			c.Warnf("%s %s %s %s %s Content-Length header is not a valid integer: %v", c.ClientIP(), c.Request.Method, c.Request.URL.Path, c.UserAgent(), c.Request.Proto, err)
 			bodySize = -1
 		}
 		if err == nil && bodySize > sizelimit {
 			finalURL := resp.Request.URL.String()
 			err = resp.Body.Close()
 			if err != nil {
-				logError("Failed to close response body: %v", err)
+				c.Errorf("Failed to close response body: %v", err)
 			}
 			c.Redirect(301, finalURL)
-			logWarning("%s %s %s %s %s Final-URL: %s Size-Limit-Exceeded: %d", c.ClientIP(), c.Request.Method, c.Request.URL.Path, c.UserAgent(), c.Request.Proto, finalURL, bodySize)
+			c.Warnf("%s %s %s %s %s Final-URL: %s Size-Limit-Exceeded: %d", c.ClientIP(), c.Request.Method, c.Request.URL.Path, c.UserAgent(), c.Request.Proto, finalURL, bodySize)
 			return
 		}
 	}
@@ -287,7 +287,7 @@ func ChallengeReq(target string, image *imageInfo, ctx context.Context, c *touka
 	defer resp401.Body.Close()
 	bearer, err := parseBearerWWWAuthenticateHeader(resp401.Header.Get("Www-Authenticate"))
 	if err != nil {
-		logError("Failed to parse Www-Authenticate header: %v", err)
+		c.Errorf("Failed to parse Www-Authenticate header: %v", err)
 		return
 	}
 
@@ -303,13 +303,13 @@ func ChallengeReq(target string, image *imageInfo, ctx context.Context, c *touka
 
 	getAuthReq, err := getAuthRB.Build()
 	if err != nil {
-		logError("Failed to create request: %v", err)
+		c.Errorf("Failed to create request: %v", err)
 		return
 	}
 
 	authResp, err := ghcrclient.Do(getAuthReq)
 	if err != nil {
-		logError("Failed to send request: %v", err)
+		c.Errorf("Failed to send request: %v", err)
 		return
 	}
 
@@ -317,7 +317,7 @@ func ChallengeReq(target string, image *imageInfo, ctx context.Context, c *touka
 
 	bodyBytes, err := io.ReadAll(authResp.Body)
 	if err != nil {
-		logError("Failed to read auth response body: %v", err)
+		c.Errorf("Failed to read auth response body: %v", err)
 		return
 	}
 
@@ -325,7 +325,7 @@ func ChallengeReq(target string, image *imageInfo, ctx context.Context, c *touka
 	var authToken AuthToken
 	err = json.Unmarshal(bodyBytes, &authToken)
 	if err != nil {
-		logError("Failed to decode auth response body: %v", err)
+		c.Errorf("Failed to decode auth response body: %v", err)
 		return
 	}
 	token = authToken.Token

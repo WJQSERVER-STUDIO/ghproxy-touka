@@ -69,8 +69,6 @@ func NoRouteHandler(cfg *config.Config) touka.HandlerFunc {
 			matcher = "raw"
 		}
 
-		logDebug("Matched: %v", matcher)
-
 		switch matcher {
 		case "releases", "blob", "raw", "gist", "api":
 			ChunkedProxyRequest(ctx, c, rawPath, cfg, matcher)
