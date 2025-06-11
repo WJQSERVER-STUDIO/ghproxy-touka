@@ -1,0 +1,7 @@
+{
+  "blacklist": [
+    "eviluser",
+    "spamuser/bad-repo",
+    "malwareuser/*"
+  ]
+}

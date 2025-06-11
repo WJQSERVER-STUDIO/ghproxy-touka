@@ -1,0 +1,64 @@
+[server]
+host = "127.0.0.1" 
+port = 8080 
+netlib = "netpoll" # "netpoll" / "std" "standard" "net/http" "net"
+sizeLimit = 125 # MB
+memLimit = 0 # MB
+H2C = true
+cors = "*" # "*"/"" -> "*" ; "nil" -> "" ;
+debug = false
+
+[httpc]
+mode = "auto" # "auto" or "advanced"
+maxIdleConns = 100 # only for advanced mode
+maxIdleConnsPerHost = 60 # only for advanced mode
+maxConnsPerHost = 0 # only for advanced mode
+
+[gitclone]
+mode = "bypass" # bypass / cache
+smartGitAddr = "http://127.0.0.1:8080"
+ForceH2C = false
+
+[shell]
+editor = false
+rewriteAPI = false
+
+[pages]
+mode = "internal" # "internal" or "external"
+theme = "bootstrap" # "bootstrap" or "nebula"
+staticDir = "/usr/local/ghproxy/pages" 
+
+[log]
+logFilePath = "/usr/local/ghproxy/log/ghproxy.log" 
+maxLogSize = 5 # MB
+level = "info" # dump, debug, info, warn, error, none
+hertzLogPath = "/usr/local/ghproxy/log/hertz.log" 
+
+[auth]
+authMethod = "parameters" # "header" or "parameters"
+authToken = "token"
+enabled = false
+passThrough = false
+ForceAllowApi = false
+
+[blacklist]
+blacklistFile = "/usr/local/ghproxy/config/blacklist.json"
+enabled = false
+
+[whitelist]
+enabled = false
+whitelistFile = "/usr/local/ghproxy/config/whitelist.json"
+
+[rateLimit]
+enabled = false
+rateMethod = "total" # "ip" or "total"
+ratePerMinute = 180
+burst = 5
+
+[outbound]
+enabled = false
+url = "socks5://127.0.0.1:1080" # "http://127.0.0.1:7890"
+
+[docker]
+enabled = false
+target = "ghcr" # ghcr/dockerhub

@@ -1,0 +1,8 @@
+demo
+demo.toml
+*.log
+*.bak
+list.json
+repos
+pages
+*_test
