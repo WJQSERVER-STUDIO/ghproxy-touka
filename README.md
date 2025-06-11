@@ -1,14 +1,13 @@
 # GHProxy-Touka
 
-
-支持 Git clone、raw、releases的 Github 加速项目, 支持自托管的同时带来卓越的性能与极低的资源占用(Golang和HertZ带来的优势), 同时支持多种额外功能
+支持 Git clone、raw、releases的 Github 加速项目, 支持自托管的同时带来卓越的性能与极低的资源占用, 同时支持多种额外功能
 
 ## 项目说明
 
 ### 项目特点
 
 - ⚡ **基于 Go 语言实现，跨平台的同时提供高并发性能**
-- 🌐 **使用字节旗下的 [HertZ](https://github.com/cloudwego/hertz) 作为 Web 框架**
+- 🌐 **使用 [Touka](https://github.com/infinite-iroha/touka)作为 Web 框架**
 - 📡 **使用 [Touka-HTTPC](https://github.com/satomitouka/touka-httpc) 作为 HTTP 客户端**
 - 📥 **支持 Git clone、raw、releases 等文件拉取**
 - 🐳 **支持反代Docker, GHCR等镜像仓库**
@@ -52,37 +51,32 @@ docker pull gh.example.com/docker.io/adguard/adguardhome
 docker pull gh.example.com/ghcr.io/openfaas/queue-worker 
 ```
 
-## 部署说明
-
-可参考文章: https://blog.wjqserver.com/post/ghproxy-deploy-with-smart-git/
-
 ### Docker部署
 
 - Docker-cli
 
 ```
-docker run -p 7210:8080 -v ./ghproxy/log/run:/data/ghproxy/log -v ./ghproxy/log/caddy:/data/caddy/log -v ./ghproxy/config:/data/ghproxy/config  --restart always wjqserver/ghproxy
+docker run -p 7210:8080 -v ./ghproxy/log/run:/data/ghproxy/log -v ./ghproxy/log/caddy:/data/caddy/log -v ./ghproxy/config:/data/ghproxy/config  --restart always wjqserver/ghproxy-touka
 ```
 
 - Docker-Compose (建议使用)
 
-    参看[docker-compose.yml](https://github.com/WJQSERVER-STUDIO/ghproxy/blob/main/docker/compose/docker-compose.yml)
-
-### 二进制文件部署(不推荐)
-
-一键部署脚本:
-
-```bash
-wget -O install.sh https://raw.githubusercontent.com/WJQSERVER-STUDIO/ghproxy/main/deploy/install.sh && chmod +x install.sh &&./install.sh
-```
-
-Dev一键部署脚本:
-
-```bash
-wget -O install-dev.sh https://raw.githubusercontent.com/WJQSERVER-STUDIO/ghproxy/dev/deploy/install-dev.sh && chmod +x install-dev.sh && ./install-dev.sh
+```yml
+version: '3.9'
+services:
+    ghproxy:
+        image: 'wjqserver/ghproxy-touka:latest'
+        restart: always
+        volumes:
+            - './ghproxy/log:/data/ghproxy/log'
+            - './ghproxy/config:/data/ghproxy/config'
+        ports:
+            - '7210:8080'
 ```
 
 ## 配置说明
+
+可参考原项目文档
 
 参看[项目文档](https://github.com/WJQSERVER-STUDIO/ghproxy/blob/main/docs/config.md)
 
@@ -92,32 +86,15 @@ wget -O install-dev.sh https://raw.githubusercontent.com/WJQSERVER-STUDIO/ghprox
 
 ## 项目简史
 
-**本项目是[WJQSERVER-STUDIO/ghproxy-go](https://github.com/WJQSERVER-STUDIO/ghproxy-go)的重构版本,实现了原项目原定功能的同时,进一步优化了性能**
-关于此项目的详细开发过程,请参看Commit记录与[CHANGELOG.md](https://github.com/WJQSERVER-STUDIO/ghproxy/blob/main/CHANGELOG.md)
-
-- v3.0.0 迁移到HertZ框架, 进一步提升效率
-- v2.4.1 对路径匹配进行优化
-- v2.0.0 对`proxy`核心模块进行了重构,大幅优化内存占用
-- v1.0.0 迁移至本仓库,并再次重构内容实现
-- v0.2.0 重构项目实现
+**本项目是[WJQSERVER-STUDIO/ghproxy](https://github.com/WJQSERVER-STUDIO/ghproxy)的移植版本, 旨在作为GHProxy v2的替代版本
 
 ## LICENSE
 
-v3.5.2开始, 本项目使用 [WJQserver Studio License 2.0](https://wjqserver-studio.github.io/LICENSE/LICENSE.html) 和 [Mozilla Public License Version 2.0](https://mozilla.org/MPL/2.0/) 双重许可, 您可从中选择一个使用
-
-前端位于单独仓库中, 且各个主题均存在各自的许可证, 本项目许可证并不包括前端
-
-在v2.3.0之前, 本项目使用WJQserver Studio License 1.2
-
-在v1.0.0版本之前,本项目继承于[WJQSERVER-STUDIO/ghproxy-go](https://github.com/WJQSERVER-STUDIO/ghproxy-go)的APACHE2.0 LICENSE VERSION
+继承于[WJQSERVER-STUDIO/ghproxy](https://github.com/WJQSERVER-STUDIO/ghproxy)的Mozila Mozilla Public License Version 2.0
 
 ## 赞助
 
 如果您觉得本项目对您有帮助,欢迎赞助支持,您的赞助将用于Demo服务器开支及开发者时间成本支出,感谢您的支持!
-
-为爱发电,开源不易
-
-爱发电: https://afdian.com/a/wjqserver
 
 USDT(TRC20): `TNfSYG6F2vkiibd6J6mhhHNWDgWgNdF5hN`
 

@@ -1,7 +1,7 @@
 version: '3.9'
 services:
     ghproxy:
-        image: 'wjqserver/ghproxy:latest'
+        image: 'wjqserver/ghproxy-touka:latest'
         restart: always
         volumes:
             - './ghproxy/log:/data/ghproxy/log'
