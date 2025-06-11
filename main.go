@@ -155,8 +155,6 @@ func setupLogger(cfg *config.Config) {
 	}
 	logger.SetLevel(recoLevel)
 
-	proxy.InitProxyReco(logger)
-
 	fmt.Printf("Log Level: %s\n", cfg.Log.Level)
 	logger.Debugf("Config File Path: %s", cfgfile)
 	logger.Debugf("Loaded config: %v", cfg)
@@ -171,7 +169,7 @@ func setMemLimit(cfg *config.Config) {
 }
 
 func loadlist(cfg *config.Config) {
-	auth.Init(cfg, logger)
+	auth.Init(cfg)
 }
 
 func setupApi(cfg *config.Config, r *touka.Engine, version string) {

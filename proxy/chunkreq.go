@@ -56,15 +56,15 @@ func ChunkedProxyRequest(ctx context.Context, c *touka.Context, u string, cfg *c
 		return
 	}
 
-	logDebug("Resp Status: %s", resp.Status)
+	c.Debugf("Resp Status: %s", resp.Status)
 	// 处理302情况
 	if resp.StatusCode == 302 {
-		//logDebug("resp header %s", resp.Header)
+		//c.Debugf("resp header %s", resp.Header)
 		finalURL := resp.Header.Get("Location")
 		if finalURL != "" {
 			err = resp.Body.Close()
 			if err != nil {
-				logError("Failed to close response body: %v", err)
+				c.Errorf("Failed to close response body: %v", err)
 			}
 			c.Infof("Internal Redirecting to %s", finalURL)
 			ChunkedProxyRequest(ctx, c, finalURL, cfg, matcher)
@@ -84,17 +84,17 @@ func ChunkedProxyRequest(ctx context.Context, c *touka.Context, u string, cfg *c
 		var err error
 		bodySize, err = strconv.Atoi(contentLength)
 		if err != nil {
-			logWarning("%s %s %s %s %s Content-Length header is not a valid integer: %v", c.ClientIP(), c.Request.Method, c.Request.URL.Path, c.UserAgent(), c.Request.Proto, err)
+			c.Warnf("%s %s %s %s %s Content-Length header is not a valid integer: %v", c.ClientIP(), c.Request.Method, c.Request.URL.Path, c.UserAgent(), c.Request.Proto, err)
 			bodySize = -1
 		}
 		if err == nil && bodySize > sizelimit {
 			finalURL := resp.Request.URL.String()
 			err = resp.Body.Close()
 			if err != nil {
-				logError("Failed to close response body: %v", err)
+				c.Errorf("Failed to close response body: %v", err)
 			}
 			c.Redirect(301, finalURL)
-			logWarning("%s %s %s %s %s Final-URL: %s Size-Limit-Exceeded: %d", c.ClientIP(), c.Request.Method, c.Request.URL.Path, c.UserAgent(), c.Request.Proto, finalURL, bodySize)
+			c.Warnf("%s %s %s %s %s Final-URL: %s Size-Limit-Exceeded: %d", c.ClientIP(), c.Request.Method, c.Request.URL.Path, c.UserAgent(), c.Request.Proto, finalURL, bodySize)
 			return
 		}
 	}
@@ -136,7 +136,7 @@ func ChunkedProxyRequest(ctx context.Context, c *touka.Context, u string, cfg *c
 			compress = "gzip"
 		}
 
-		logDebug("Use Shell Editor: %s %s %s %s %s", c.ClientIP(), c.Request.Method, u, c.UserAgent(), c.Request.Proto)
+		c.Debugf("Use Shell Editor: %s %s %s %s %s", c.ClientIP(), c.Request.Method, u, c.UserAgent(), c.Request.Proto)
 		c.Header("Content-Length", "")
 
 		var reader io.Reader
@@ -144,7 +144,7 @@ func ChunkedProxyRequest(ctx context.Context, c *touka.Context, u string, cfg *c
 		reader, _, err = processLinks(bodyReader, compress, c.Request.Host, cfg, c)
 		c.WriteStream(reader)
 		if err != nil {
-			logError("%s %s %s %s %s Failed to copy response body: %v", c.ClientIP(), c.Request.Method, u, c.UserAgent(), c.Request.Proto, err)
+			c.Errorf("%s %s %s %s %s Failed to copy response body: %v", c.ClientIP(), c.Request.Method, u, c.UserAgent(), c.Request.Proto, err)
 			ErrorPage(c, NewErrorWithStatusLookup(500, fmt.Sprintf("Failed to copy response body: %v", err)))
 			return
 		}
