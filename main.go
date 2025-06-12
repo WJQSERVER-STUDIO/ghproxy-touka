@@ -144,10 +144,11 @@ func setupLogger(cfg *config.Config) {
 	}
 	recoLevel := reco.ParseLevel(cfg.Log.Level)
 	logger, err = reco.New(reco.Config{
-		Level:         recoLevel,
-		Mode:          reco.ModeText,
-		FilePath:      cfg.Log.LogFilePath,
-		MaxFileSizeMB: cfg.Log.MaxLogSize,
+		Level:          recoLevel,
+		Mode:           reco.ModeText,
+		FilePath:       cfg.Log.LogFilePath,
+		MaxFileSizeMB:  cfg.Log.MaxLogSize,
+		EnableRotation: true,
 	})
 	if err != nil {
 		fmt.Printf("Failed to initialize logger: %v\n", err)
