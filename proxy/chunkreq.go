@@ -32,7 +32,7 @@ func ChunkedProxyRequest(ctx context.Context, c *touka.Context, u string, cfg *c
 
 	rb := client.NewRequestBuilder(c.Request.Method, u)
 	rb.NoDefaultHeaders()
-	//rb.SetBody(c.Request.Body)
+	rb.SetBody(c.Request.Body)
 	rb.WithContext(ctx)
 
 	req, err = rb.Build()
