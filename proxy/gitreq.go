@@ -14,7 +14,6 @@ import (
 func GitReq(ctx context.Context, c *touka.Context, u string, cfg *config.Config, mode string) {
 
 	var (
-		req  *http.Request
 		resp *http.Response
 	)
 
@@ -23,14 +22,17 @@ func GitReq(ctx context.Context, c *touka.Context, u string, cfg *config.Config,
 		if resp != nil && resp.Body != nil {
 			resp.Body.Close()
 		}
-		if req != nil {
-			req.Body.Close()
-		}
 	}()
 
-	method := c.Request.Method
+	/*
+		fullBody, err := c.GetReqBodyFull()
+		if err != nil {
+			HandleError(c, fmt.Sprintf("Failed to read request body: %v", err))
+			return
+		}
+		reqBodyReader := bytes.NewBuffer(fullBody)
+	*/
 
-	//reqBodyReader := bytes.NewBuffer(c.Request.Body())
 	reqBodyReader, err := c.GetReqBodyBuffer()
 	if err != nil {
 		HandleError(c, fmt.Sprintf("Failed to read request body: %v", err))
@@ -50,7 +52,7 @@ func GitReq(ctx context.Context, c *touka.Context, u string, cfg *config.Config,
 	}
 
 	if cfg.GitClone.Mode == "cache" {
-		rb := gitclient.NewRequestBuilder(method, u)
+		rb := gitclient.NewRequestBuilder(c.Request.Method, u)
 		rb.NoDefaultHeaders()
 		rb.SetBody(reqBodyReader)
 		rb.WithContext(ctx)
@@ -69,6 +71,7 @@ func GitReq(ctx context.Context, c *touka.Context, u string, cfg *config.Config,
 			HandleError(c, fmt.Sprintf("Failed to send request: %v", err))
 			return
 		}
+		defer resp.Body.Close()
 	} else {
 		rb := client.NewRequestBuilder(c.Request.Method, u)
 		rb.NoDefaultHeaders()
@@ -89,6 +92,7 @@ func GitReq(ctx context.Context, c *touka.Context, u string, cfg *config.Config,
 			HandleError(c, fmt.Sprintf("Failed to send request: %v", err))
 			return
 		}
+		defer resp.Body.Close()
 	}
 
 	contentLength := resp.Header.Get("Content-Length")
@@ -113,7 +117,8 @@ func GitReq(ctx context.Context, c *touka.Context, u string, cfg *config.Config,
 			}
 		}
 	*/
-	copyHeader(resp.Header, c.GetAllReqHeader())
+	//copyHeader( resp.Header)
+	c.SetHeaders(resp.Header)
 
 	headersToRemove := map[string]struct{}{
 		"Content-Security-Policy":   {},
@@ -144,6 +149,10 @@ func GitReq(ctx context.Context, c *touka.Context, u string, cfg *config.Config,
 	}
 
 	bodyReader := resp.Body
+
+	// 读取body内容
+	//bodyContent, _ := io.ReadAll(bodyReader)
+	//	c.Infof("%s", bodyContent)
 
 	if cfg.RateLimit.BandwidthLimit.Enabled {
 		bodyReader = limitreader.NewRateLimitedReader(bodyReader, bandwidthLimit, int(bandwidthBurst), ctx)

@@ -15,7 +15,6 @@ import (
 	"ghproxy/config"
 	"ghproxy/proxy"
 
-	//"ghproxy/rate"
 	"ghproxy/weakcache"
 
 	"github.com/fenthope/ikumi"
@@ -373,6 +372,25 @@ func main() {
 	r.SetLogger(logger)
 	r.Use(record.Middleware()) // log中间件
 	r.Use(viaHeader())
+	/*
+		r.Use(compress.Compression(compress.CompressOptions{
+			Algorithms: map[string]compress.AlgorithmConfig{
+				compress.EncodingGzip: {
+					Level:       gzip.BestCompression, // Gzip最高压缩比
+					PoolEnabled: true,                 // 启用Gzip压缩器的对象池
+				},
+				compress.EncodingDeflate: {
+					Level:       flate.DefaultCompression, // Deflate默认压缩比
+					PoolEnabled: false,                    // Deflate不启用对象池
+				},
+				compress.EncodingZstd: {
+					Level:       int(zstd.SpeedBestCompression), // Zstandard最佳压缩比
+					PoolEnabled: true,                           // 启用Zstandard压缩器的对象池
+				},
+			},
+		}))
+	*/
+
 	if cfg.RateLimit.Enabled {
 		r.Use(ikumi.TokenRateLimit(ikumi.TokenRateLimiterOptions{
 			Limit: rate.Limit(cfg.RateLimit.RatePerMinute),
@@ -410,6 +428,10 @@ func main() {
 		c.Set("matcher", "clone")
 		proxy.RoutingHandler(cfg)(c)
 	})
+	r.POST("/github.com/:user/:repo/git-upload-pack", func(c *touka.Context) {
+		c.Set("matcher", "clone")
+		proxy.RoutingHandler(cfg)(c)
+	})
 
 	r.GET("/raw.githubusercontent.com/:user/:repo/*filepath", func(c *touka.Context) {
 		c.Set("matcher", "raw")
@@ -421,7 +443,7 @@ func main() {
 		proxy.NoRouteHandler(cfg)(c)
 	})
 
-	r.GET("/api.github.com/repos/:user/:repo/*filepath", func(c *touka.Context) {
+	r.ANY("/api.github.com/repos/:user/:repo/*filepath", func(c *touka.Context) {
 		c.Set("matcher", "api")
 		proxy.RoutingHandler(cfg)(c)
 	})

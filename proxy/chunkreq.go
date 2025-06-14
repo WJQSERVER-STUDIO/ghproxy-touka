@@ -56,7 +56,6 @@ func ChunkedProxyRequest(ctx context.Context, c *touka.Context, u string, cfg *c
 		return
 	}
 
-	c.Debugf("Resp Status: %s", resp.Status)
 	// 处理302情况
 	if resp.StatusCode == 302 {
 		//c.Debugf("resp header %s", resp.Header)
