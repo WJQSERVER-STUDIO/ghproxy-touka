@@ -421,7 +421,7 @@ func main() {
 		proxy.NoRouteHandler(cfg)(c)
 	})
 
-	r.GET("/api.github.com/repos/:user/:repo/*filepath", func(c *touka.Context) {
+	r.ANY("/api.github.com/repos/:user/:repo/*filepath", func(c *touka.Context) {
 		c.Set("matcher", "api")
 		proxy.RoutingHandler(cfg)(c)
 	})

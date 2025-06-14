@@ -30,12 +30,18 @@ func GitReq(ctx context.Context, c *touka.Context, u string, cfg *config.Config,
 
 	method := c.Request.Method
 
-	//reqBodyReader := bytes.NewBuffer(c.Request.Body())
 	reqBodyReader, err := c.GetReqBodyBuffer()
 	if err != nil {
 		HandleError(c, fmt.Sprintf("Failed to read request body: %v", err))
 		return
 	}
+	/*
+		reqBodyReader, err := c.GetReqBodyBuffer()
+		if err != nil {
+			HandleError(c, fmt.Sprintf("Failed to read request body: %v", err))
+			return
+		}
+	*/
 
 	//bodyReader := c.Request.BodyStream() // 不可替换为此实现
 
