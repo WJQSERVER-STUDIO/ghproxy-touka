@@ -428,6 +428,10 @@ func main() {
 		c.Set("matcher", "clone")
 		proxy.RoutingHandler(cfg)(c)
 	})
+	r.POST("/github.com/:user/:repo/git-upload-pack", func(c *touka.Context) {
+		c.Set("matcher", "clone")
+		proxy.RoutingHandler(cfg)(c)
+	})
 
 	r.GET("/raw.githubusercontent.com/:user/:repo/*filepath", func(c *touka.Context) {
 		c.Set("matcher", "raw")
