@@ -57,7 +57,7 @@ func ChunkedProxyRequest(ctx context.Context, c *touka.Context, u string, cfg *c
 	}
 
 	// 处理302情况
-	if resp.StatusCode == 302 {
+	if resp.StatusCode == 302 || resp.StatusCode == 301 {
 		//c.Debugf("resp header %s", resp.Header)
 		finalURL := resp.Header.Get("Location")
 		if finalURL != "" {
@@ -67,6 +67,7 @@ func ChunkedProxyRequest(ctx context.Context, c *touka.Context, u string, cfg *c
 			}
 			c.Infof("Internal Redirecting to %s", finalURL)
 			ChunkedProxyRequest(ctx, c, finalURL, cfg, matcher)
+			return
 		}
 	}
 
