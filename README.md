@@ -1,5 +1,7 @@
 # GHProxy-Touka
 
+现已作为 [WJQSERVER-STUDIO/ghproxy](https://github.com/WJQSERVER-STUDIO/ghproxy) v4
+
 支持 Git clone、raw、releases的 Github 加速项目, 支持自托管的同时带来卓越的性能与极低的资源占用, 同时支持多种额外功能
 
 ## 项目说明
